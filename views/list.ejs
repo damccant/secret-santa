@@ -1,0 +1,40 @@
+<%- include('header.ejs') %>
+<main role="main" class="container-fluid">
+	<div>
+		<div class="row text-center">
+			<h1 class="display-5 fw-bold">
+				<a href="/admin" class="btn btn-secondary">Back</a>
+				<%= s.header %>
+			</h1>
+		</div>
+		<div class="row table-responsive">
+			<table class="table table-sm hfill">
+				<thead>
+					<tr>
+						<th scope="col">ID</th>
+						<th scope="col">URL</th>
+						<th scope="col">Lang</th>
+						<th scope="col">Timestamp</th>
+						<% for(var f of FIELDS) { %>
+							<th scope="col"><%= s[f.name] %></th>
+						<% } %>
+					</tr>
+				</thead>
+				<tbody>
+					<% for(var r of results) { %>
+						<tr>
+							<th scope="row"><%= r.id %></th>
+							<td><%= r.submission_pass %></td>
+							<td><%= r.lang %></td>
+							<td><%= new Date(r.timestamp).toLocaleString() %></td>
+							<% for(var f of FIELDS) { %>
+								<td><%= r[f.name] %></td>
+							<% } %>
+						</tr>
+					<% } %>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</main>
+<%- include('footer.ejs') %>

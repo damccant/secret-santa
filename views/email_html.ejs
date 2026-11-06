@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title><%= s.title %></title>
+    <style type="text/css">
+        body { margin: 0; padding: 0; background-color: #f4f4f4; font-family: Arial, sans-serif; }
+        table { border-collapse: collapse; }
+        .container { width: 100%; max-width: 600px; margin: 0 auto; background-color: #ffffff; }
+        .header { background-color: #345C72; color: #ffffff; text-align: center; padding: 20px; }
+        .body { padding: 20px; font-size: 16px; line-height: 1.6; color: #555555; }
+        .footer { background-color: #333333; color: #999999; text-align: center; padding: 20px; }
+        .cta { background-color: #345C72; padding: 10px 20px; border-radius: 5px; color: #ffffff; text-decoration: none; font-weight: bold; }
+        @media screen and (max-width: 600px) {
+            .container {
+                width: 100% !important;
+                padding: 10px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+            <td align="center">
+                <table class="container" width="600" cellpadding="0" cellspacing="0">
+                    <!-- Header -->
+                    <tr>
+                        <td class="header">
+                            <h1><%= s.title %></h1>
+                        </td>
+                    </tr>
+                    <!-- Body -->
+                    <tr>
+                        <td class="body">
+                            <p><%= s.email_prompt.replace("%s", giver.name) %></p>
+                            <table width="100%" cellpadding="0" cellspacing="0" style="border: 1px solid #cccccc; padding: 20px;">
+                                <tr>
+                                    <td align="center">
+                                        <h1 style="color: #345C72;"><%= taker.name %></h1>
+                                        <table width="100%">
+                                            <tr>
+                                                <td>
+                                                    <%= s.color %>
+                                                </td>
+                                                <td style="background-color: <%= taker.color %>;"></td>
+                                            </tr>
+                                            <%- include('email_line.ejs', { f: "addl_color" }) %>
+                                            <%- include('email_line.ejs', { f: "fav_brand" }) %>
+                                            <tr>
+                                                <td>
+                                                    <%= s.shirt_size %>
+                                                </td>
+                                                <td>
+                                                    <%= s["size_" + taker.shirt_size] %>
+                                                </td>
+                                            </tr>
+                                            <%- include('email_line.ejs', { f: "pant_size" }) %>
+                                            <%- include('email_line.ejs', { f: "shoe_size" }) %>
+                                            <%- include('email_line.ejs', { f: "sports" }) %>
+                                            <%- include('email_line.ejs', { f: "snacks" }) %>
+                                            <%- include('email_line.ejs', { f: "drinks" }) %>
+                                            <%- include('email_line.ejs', { f: "restaurant" }) %>
+                                            <%- include('email_line.ejs', { f: "hobbies" }) %>
+                                            <%- include('email_line.ejs', { f: "like" }) %>
+                                            <%- include('email_line.ejs', { f: "dislike" }) %>
+                                            <%- include('email_line.ejs', { f: "allergies" }) %>
+                                            <%- include('email_line.ejs', { f: "extra" }) %>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                            <p><%= s.email_secret_id.replace("%s", taker.id) %></p>
+                        </td>
+                    </tr>
+                    <!-- Footer -->
+                    <tr>
+                        <td class="footer">
+                            <p><%= s.email_footer.replace("%s", support) %></p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

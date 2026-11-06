@@ -1,0 +1,11 @@
+<div class="mb-3">
+	<label for="<%= f_name %>" class="form-label"><%= p_name %></label>
+	<% const _value = (typeof default_value == "undefined") ? "" : ` value=${default_value}`; %>
+	<% const _step = (typeof step == "undefined") ? "" : ` step=${step}`; %>
+	<% if(typeof help !== "undefined") { %>
+		<input type="<%= type %>" class="form-control" id="<%= f_name %>" name="<%= f_name %>" aria-describedby="<%= f_name %>_help"<%= _value + _step %>>
+		<div id="<%= f_name %>_help" class="form-text"><%= help %></div>
+	<% } else { %>
+		<input type="<%= type %>" class="form-control" id="<%= f_name %>" name="<%= f_name %>"<%= _value + _step %>>
+	<% } %>
+</div>

@@ -1,0 +1,30 @@
+{
+  "name": "secret-santa",
+  "version": "1.0.0",
+  "description": "Secret Santa",
+  "keywords": [
+    "Secret",
+    "Santa"
+  ],
+  "homepage": "https://github.com/damccant/secret-santa#readme",
+  "bugs": {
+    "url": "https://github.com/damccant/secret-santa/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/damccant/secret-santa.git"
+  },
+  "license": "MIT",
+  "author": "Derek McCants",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "ejs": "^7.0.2",
+    "express": "^5.3.0",
+    "nodemailer": "^10.3.1"
+  }
+}

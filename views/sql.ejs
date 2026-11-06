@@ -1,0 +1,31 @@
+<%- include('header.ejs') %>
+<style>
+	.vfill {
+		height: 100%;
+	}
+</style>
+<main role="main" class="container-fluid">
+	<div class="row">
+		<div class="col-lg-6">
+			<form method="POST">
+				<div class="row">
+					<label for="input" class="form-label">SQL</label>
+					<textarea id="input" name="input" class="form-control hfill vfill" placeholder="SELECT * FROM users;" rows="12"><%= input %></textarea>
+				</div>
+				<div class="row">
+					<div class="col-sm-6">
+						<a href="/admin" class="btn btn-secondary hfill">Back</a>
+					</div>
+					<div class="col-sm-6">
+						<input type="submit" class="btn btn-primary hfill" value="Run">
+					</div>
+				</div>
+			</form>
+		</div>
+		<div class="col-lg-6">
+			<label for="output" class="form-label">Output</label>
+			<textarea id="output" class="form-control hfill vfill" readonly><%= results %></textarea>
+		</div>
+	</div>
+</main>
+<%- include('footer.ejs') %>

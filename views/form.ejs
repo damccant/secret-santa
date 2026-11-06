@@ -1,0 +1,63 @@
+<%- include('./header.ejs') %>
+<main role="main" class="container">
+	<div>
+		<div class="row text-center">
+			<h1 class="display-5 fw-bold"><%= s.header %></h1>
+			<p class="lead mb-4">
+				<%= s.prompt %>
+			</p>
+		</div>
+		<form method="POST">
+			<div class="row">
+				<div class="col-md-6">
+					<%- include('text_field.ejs', {type: "email", f_name: "email", p_name: s.email, help: s.email_help}) %>
+				</div>
+				<div class="col-md-6">
+					<%- include('text_field.ejs', {type: "text", f_name: "name", p_name: s.name, help: s.name_help}) %>
+				</div>
+			</div>
+			
+			<%- include('text_field.ejs', {type: "color", f_name: "color", p_name: s.color, help: s.color_help, default_value: "#ffffff"}) %>
+			<%- include('text_field.ejs', {type: "text", f_name: "addl_color", p_name: s.addl_color, help: s.optional}) %>
+			<%- include('text_field.ejs', {type: "text", f_name: "fav_brand", p_name: s.fav_brand, help: s.list_many_help}) %>
+			<div class="row">
+				<div class="col-md-4">
+					<div class="mb-3">
+						<label for="shirt_size" class="form-label"><%= s.shirt_size %></label>
+						<select class="form-select" id="shirt_size" name="shirt_size" aria-label="<%= s.select_size %>">
+							<option selected><%= s.select_size %></option>
+							<option value="xs"><%= s.size_xs %></option>
+							<option value="s"><%= s.size_s %></option>
+							<option value="m"><%= s.size_m %></option>
+							<option value="l"><%= s.size_l %></option>
+							<option value="xl"><%= s.size_xl %></option>
+							<option value="2xl"><%= s.size_2xl %></option>
+						</select>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<%- include('text_field.ejs', {type: "text", f_name: "pant_size", p_name: s.pant_size}) %>
+				</div>
+				<div class="col-md-4">
+					<%- include('text_field.ejs', {type: "number", f_name: "shoe_size", p_name: s.shoe_size, step: 0.5}) %>
+				</div>
+			</div>
+			<%- include('text_field.ejs', {type: "text", f_name: "sports", p_name: s.sports, help: s.optional}) %>
+			<%- include('text_field.ejs', {type: "text", f_name: "snacks", p_name: s.snacks, help: s.list_many_help}) %>
+			<%- include('text_field.ejs', {type: "text", f_name: "drinks", p_name: s.drinks, help: s.drinks_help}) %>
+			<%- include('text_field.ejs', {type: "text", f_name: "restaurant", p_name: s.restaurant, help: s.list_many_help}) %>
+			<%- include('text_field.ejs', {type: "text", f_name: "hobbies", p_name: s.hobbies, help: s.list_many_help}) %>
+			<%- include('text_field.ejs', {type: "text", f_name: "like", p_name: s.like, help: s.list_many_help}) %>
+			<%- include('text_field.ejs', {type: "text", f_name: "dislike", p_name: s.dislike, help: s.list_many_help}) %>
+			<%- include('text_field.ejs', {type: "text", f_name: "allergies", p_name: s.allergies, help: s.allergies_help}) %>
+			<%- include('text_field.ejs', {type: "text", f_name: "extra", p_name: s.extra, help: s.optional}) %>
+			<div class="row text-center">
+				<div class="mb-4">
+					<input type="submit" class="form-control btn btn-primary btn-lg" id="submit" aria-describedby="submit_help" value="<%= s.submit %>">
+					<div id="submit_help" class="form-text"><%= s.submit_help %></div>
+				</div>
+			</div>
+		</form>
+	</div>
+</main><!-- /.container -->
+<%- include('./footer.ejs') %>

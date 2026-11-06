@@ -1,0 +1,81 @@
+<%- include('header.ejs') %>
+<style>
+	.danger-stripes {
+		color: #ffffff;
+		background: repeating-linear-gradient(
+			45deg,
+			#000000,
+			#000000 10px,
+			#7f7f00 10px,
+			#7f7f00 20px
+		)
+	}
+</style>
+<main role="main" class="container">
+	<div>
+		<div class="row text-center">
+			<h1 class="display-5 fw-bold"><%= s.title %> &mdash; Admin Page</h1>
+		</div>
+		<div class="row">
+			<div class="col-12">
+				<ul>
+					<li>
+						<a href="/list">View all submissions</a>
+					</li>
+					<li>
+						<a href="/sql">Run SQL</a>
+					</li>
+					<li>
+						View sample email
+						<form method="POST" action="/email_html">
+							<div class="input-group mb-3">
+								<input type="text" name="giver" class="form-control" placeholder="Giver ID" aria-label="Giver ID">
+								<input type="text" name="taker" class="form-control" placeholder="Taker ID" aria-label="Taker ID">
+								<input type="submit" class="btn btn-outline-secondary" value="Preview">
+							</div>
+						</form>
+					</li>
+					<li>
+						Make All Assignments and Send Emails
+						<form method="POST" action="/run">
+							<div class="input-group mb-3">
+								<input type="text" name="submission_pass" class="form-control" placeholder="Submission Pass" aria-label="Submission Pass">
+								<input type="submit" class="btn danger-stripes" value="Run Now">
+							</div>
+						</form>
+					</li>
+					<li>
+						<form method="POST" action="/logout">
+							<input type="submit" class="btn btn-secondary" value="Logout">
+						</form>
+					</li>
+				</ul>
+			</div>
+			<div class="col-12">
+				<table class="table table-sm">
+					<thead>
+						<th>
+							Username
+						</th>
+						<th>
+							Session Cookie
+						</th>
+					</thead>
+					<tbody>
+						<% for(var session of sessions) { %>
+						<tr>
+							<td>
+								<%= session.user %>
+							</td>
+							<td>
+								<%= session.cookie %>
+							</td>
+						</tr>
+						<% } %>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</main>
+<%- include('footer.ejs') %>
