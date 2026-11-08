@@ -2,7 +2,8 @@ const config = require("./config.json");
 const strings = require("./strings.json");
 
 const express = require("express");
-const { Database } = require("node:sqlite");
+// use DatabaseSync for compatibility with older Node.JS versions
+const { DatabaseSync } = require("node:sqlite");
 
 const { argon2Sync, randomBytes, timingSafeEqual } = require("node:crypto");
 const secret = Buffer.from(config.secret, 'base64'); // pepper
@@ -29,7 +30,6 @@ function hashPassword(plaintext) {
 }
 
 // console.log(toB64NoPad(randomBytes(64)));
-// console.log(hashPassword("abcdef"));
 
 function verifyPassword(password, hash) {
 	const p = hash.split('$');
@@ -48,7 +48,7 @@ function verifyPassword(password, hash) {
 	return timingSafeEqual(actual, expected);
 }
 
-var db = new Database("./db.sqlite");
+var db = new DatabaseSync("./db.sqlite");
 
 const FIELDS = [
 	{name: "email", sql_type: "VARCHAR(100) NOT NULL"},
@@ -185,7 +185,10 @@ if(!config.lockdown)
 
 	app.get("/login", (req, res) => {
 		if(checkLogin(req)) // already logged in?
+		{
 			res.redirect("/admin");
+			return;
+		}
 		res.render('login', { s: strings.en });
 	});
 
@@ -206,7 +209,7 @@ if(!config.lockdown)
 		if(checkLogin(req))
 			next();
 		else
-			res.status(401).redirect("/login");
+			res.redirect("/login");
 	});
 
 	app.get("/admin", (req, res) => {
