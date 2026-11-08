@@ -48,7 +48,7 @@ function verifyPassword(password, hash) {
 	return timingSafeEqual(actual, expected);
 }
 
-var db = new DatabaseSync("./db.sqlite");
+var db = new DatabaseSync("./db/db.sqlite");
 
 const FIELDS = [
 	{name: "email", sql_type: "VARCHAR(100) NOT NULL"},
