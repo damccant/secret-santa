@@ -3,7 +3,7 @@ const strings = require("./strings.json");
 
 const express = require("express");
 // use DatabaseSync for compatibility with older Node.JS versions
-const { DatabaseSync } = require("node:sqlite");
+const { DatabaseSync, constants } = require("node:sqlite");
 
 const { argon2Sync, randomBytes, timingSafeEqual } = require("node:crypto");
 const secret = Buffer.from(config.secret, 'base64'); // pepper
@@ -48,7 +48,48 @@ function verifyPassword(password, hash) {
 	return timingSafeEqual(actual, expected);
 }
 
-var db = new DatabaseSync("./db/db.sqlite");
+var db = new DatabaseSync("./db/db.sqlite",
+	{
+		// DENY LOADING COMPILED EXTENSIONS
+		allowExtension: false,
+		enabledDoubleQuotedStringLiterals: false,
+		defensive: true,
+		limits: {
+			"SQLITE_LIMIT_ATTACHED": 0,
+			"SQLITE_LIMIT_EXPR_DEPTH": 50
+		}
+	}
+);
+
+db.setAuthorizer((actionCode, arg1, arg2, dbName, triggerName) => {
+	if(actionCode == constants.SQLITE_ATTACH)
+		return constants.SQLITE_DENY;
+	if(actionCode == constants.SQLITE_LOAD_EXTENSION)
+		return constants.SQLITE_DENY;
+	if (actionCode === constants.SQLITE_PRAGMA) {
+		// Optionally whitelist benign pragmas like 'foreign_keys' or 'busy_timeout' [1.2.2, 2.3]
+		const allowedPragmas = ['foreign_keys', 'busy_timeout', 'table_info', 'index_list'];
+		if (!allowedPragmas.includes(arg1.toLowerCase()))
+			return constants.SQLITE_DENY; 
+	}
+	// --- PERMITTED ADMIN COMMANDS ---
+	// Explicitly allow schema mutations since they are required for administrative panel
+	const allowedAdminActions = [
+		constants.SQLITE_SELECT, constants.SQLITE_READ,       // Querying [1.5]
+		constants.SQLITE_INSERT, constants.SQLITE_UPDATE,     // Data Modification
+		constants.SQLITE_DELETE,                              // Purging Records
+		constants.SQLITE_CREATE_TABLE, constants.SQLITE_DROP_TABLE, // Schema Changes
+		constants.SQLITE_CREATE_INDEX, constants.SQLITE_DROP_INDEX, // Index Optimization
+		constants.SQLITE_ALTER_TABLE                          // Table Structure Shifts
+	];
+
+	if (allowedAdminActions.includes(actionCode)) {
+		return constants.SQLITE_OK; // Safe database actions
+	}
+
+	// Default block for any undocumented or high-risk operational edge-cases
+	return constants.SQLITE_DENY; 
+});
 
 const FIELDS = [
 	{name: "email", sql_type: "VARCHAR(100) NOT NULL"},
