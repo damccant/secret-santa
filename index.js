@@ -80,7 +80,8 @@ db.setAuthorizer((actionCode, arg1, arg2, dbName, triggerName) => {
 		constants.SQLITE_DELETE,                              // Purging Records
 		constants.SQLITE_CREATE_TABLE, constants.SQLITE_DROP_TABLE, // Schema Changes
 		constants.SQLITE_CREATE_INDEX, constants.SQLITE_DROP_INDEX, // Index Optimization
-		constants.SQLITE_ALTER_TABLE                          // Table Structure Shifts
+		constants.SQLITE_ALTER_TABLE,                         // Table Structure Shifts
+		constants.SQLITE_TRANSACTION
 	];
 
 	if (allowedAdminActions.includes(actionCode)) {
@@ -94,6 +95,7 @@ db.setAuthorizer((actionCode, arg1, arg2, dbName, triggerName) => {
 const FIELDS = [
 	{name: "email", sql_type: "VARCHAR(100) NOT NULL"},
 	{name: "name", sql_type: "TEXT NOT NULL"},
+	{name: "hid", sql_type: "CHAR NOT NULL"},
 	{name: "color", sql_type: "CHAR(7) NOT NULL"},
 	{name: "addl_color", sql_type: "TEXT"},
 	{name: "shirt_size", sql_type: "VARCHAR(3) NOT NULL"},
@@ -115,6 +117,7 @@ try {
 	db.exec(`
 		CREATE TABLE users(
 			id INTEGER PRIMARY KEY,
+			aid INTEGER NULL,
 			submission_pass VARCHAR(8) NOT NULL,
 			lang CHAR(2) NOT NULL,
 			timestamp DATETIME NOT NULL,
@@ -239,7 +242,7 @@ if(!config.lockdown)
 		{
 			const new_session = randomBytes(32).toString('base64').replace('=', '#');
 			sessions.push({user: req.body.username, cookie: new_session });
-			res.header("Set-Cookie", `session=${new_session},HttpOnly,SameSite=Lax,Secure`);
+			res.header("Set-Cookie", `session=${new_session}; HttpOnly; SameSite=Strict; Secure`);
 			res.redirect("/admin");
 		}
 		else
@@ -300,16 +303,42 @@ if(!config.lockdown)
 		while (hasConflict) {
 			// 1. Perform standard Fisher-Yates shuffle
 			for (let i = shuffled.length - 1; i > 0; i--) {
-			const j = Math.floor(Math.random() * (i + 1));
-			[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+				const j = Math.floor(Math.random() * (i + 1));
+				[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
 			}
 
 			// 2. Check if ANY item is still in its starting position
-			hasConflict = shuffled.some((item, index) => item === original[index]);
+			//hasConflict = shuffled.some((item, index) => item === original[index]);
+			hasConflict = shuffled.some((item, index) => item.hid == original[index].hid);
 		}
 
 		return shuffled;
 	}
+
+	app.post("/assign", (req, res) => {
+		const submission = req.body.submission_pass;
+		if(!submission)
+			res.status(400).send("Missing submission_pass");
+		db.exec("BEGIN TRANSACTION;");
+		try {
+			const givers = db
+				.prepare("SELECT id, hid FROM users WHERE submission_pass = ?;")
+				.all(submission);
+			const takers = shuffleDerangement(givers);
+			for(var i = 0; i < givers.length; ++i)
+				db.prepare("UPDATE users SET aid = :aid WHERE id = :id")
+					.all({
+						aid: takers[i].id,
+						id: givers[i].id
+					});
+			db.exec("COMMIT;");
+			res.status(200).send("Success");
+		} catch(e) {
+			console.log(e);
+			db.exec("ROLLBACK;");
+			res.status(500).send(e);
+		}
+	});
 
 	function load_giver_taker_info(giver_id, taker_id) {
 		var ret = {
@@ -325,9 +354,8 @@ if(!config.lockdown)
 
 	function make_givers_takers(submission_pass) {
 		const givers = db
-			.prepare("SELECT id FROM users WHERE submission_pass = ?;")
-			.all(submission_pass)
-			.map(g => g.id);
+			.prepare("SELECT id, hid FROM users WHERE submission_pass = ?;")
+			.all(submission_pass);
 		const takers = shuffleDerangement(givers);
 		return {givers, takers};
 	}

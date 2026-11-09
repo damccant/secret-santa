@@ -36,11 +36,20 @@
 						</form>
 					</li>
 					<li>
-						Make All Assignments and Send Emails
-						<form method="POST" action="/run">
+						Make Assignments
+						<form method="POST" action="/assign">
 							<div class="input-group mb-3">
 								<input type="text" name="submission_pass" class="form-control" placeholder="Submission Pass" aria-label="Submission Pass">
-								<input type="submit" class="btn danger-stripes" value="Run Now">
+								<input type="submit" class="btn btn-primary" value="Assign">
+							</div>
+						</form>
+					</li>
+					<li>
+						Send Assignments
+						<form method="POST" action="/send">
+							<div class="input-group mb-3">
+								<input type="text" name="submission_pass" class="form-control" placeholder="Submission Pass" aria-label="Submission Pass">
+								<input type="submit" class="btn btn-danger" value="Run Now">
 							</div>
 						</form>
 					</li>

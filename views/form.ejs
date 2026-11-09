@@ -9,11 +9,29 @@
 		</div>
 		<form method="POST">
 			<div class="row">
-				<div class="col-md-6">
+				<div class="col-md-4">
 					<%- include('text_field.ejs', {type: "email", f_name: "email", p_name: s.email, help: s.email_help}) %>
 				</div>
-				<div class="col-md-6">
+				<div class="col-md-4">
 					<%- include('text_field.ejs', {type: "text", f_name: "name", p_name: s.name, help: s.name_help}) %>
+				</div>
+				<div class="col-md-4">
+					<div class="mb-3">
+						<label for="hid" class="form-label"><%= s.hid %></label>
+						<select class="form-select" id="hid" name="hid" aria-label="<%= s.hid %>">
+							<option selected><%= s.select_hid %></option>
+							<option value="a"><%= s.hid_a %></option>
+							<option value="r"><%= s.hid_r %></option>
+							<option value="t"><%= s.hid_t %></option>
+							<option value="m"><%= s.hid_m %></option>
+							<option value="s"><%= s.hid_s %></option>
+							<option value="o"><%= s.hid_o %></option>
+							<option value="p"><%= s.hid_p %></option>
+							<option value="q"><%= s.hid_q %></option>
+							<option value="z"><%= s.hid_z %></option>
+						</select>
+						<div id="hid_help" class="form-text"><%= s.hid_help %></div>
+					</div>
 				</div>
 			</div>
 			
