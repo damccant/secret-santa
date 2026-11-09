@@ -345,9 +345,7 @@ if(!config.lockdown)
 			giver: db.prepare("SELECT email, lang, name FROM users WHERE id = ?;").all(giver_id)[0],
 			taker: db.prepare("SELECT * FROM users WHERE id = ?;").all(taker_id)[0]
 		};
-		ret.s = strings[ret.giver.lang];
-		if(ret.s === undefined)
-			ret.s = strings.en;
+		ret.s = strings[ret.giver.lang] ?? strings.en;
 		ret.support = config.email.auth.user;
 		return ret;
 	}
@@ -415,18 +413,45 @@ if(!config.lockdown)
 			}));
 	}
 
-	app.post("/run", async (req, res) => {
-		const {givers, takers} = make_givers_takers(req.body.submission_pass);
-		const success = {};
+	function gather_shuffle_results(submission) {
+		return db.prepare(`
+			SELECT g.email AS giver_email, g.lang AS giver_lang, g.name AS giver_name, t.* FROM users t
+				LEFT JOIN users g
+					ON t.id = g.aid
+				WHERE g.submission_pass = ?;
+			`).all(submission);
+	}
 
-		for(var i = 0; i < givers.length; ++i) {
-			const p = load_giver_taker_info(givers[i], takers[i]);
-			const html = await renderHtml(res, "email_html", p);
-			success[p.giver.email] = await sendMail(p.giver.email, strings[p.giver.lang].title, html);
+	app.post("/send", async (req, res) => {
+		const submission = req.body.submission_pass;
+		if(!submission) {
+			res.status(400).send("Missing submission_pass");
+			return;
 		}
+		var results = gather_shuffle_results(submission);
+		if(results.length < 1) {
+			res.status(400).send("Wrong/incorrect submission_pass");
+			return;
+		}
+		results = results.map(r => {
+			return {
+				giver: {
+					email: r.giver_email,
+					lang: r.giver_lang,
+					name: r.giver_name,
+				},
+				taker: r,
+				support: config.email.auth.user,
+				s: strings[r.giver_lang] ?? strings.en
+		};}).map(r => res.render('email_html', r, async (err, html) => {
+			if(err)
+				console.log(`Failed to render email for ${r.giver.email}: ${err}`);
+			else
+				await sendMail(r.giver.email, (strings[r.giver.lang] ?? strings.en).title, html);
+		}));
+		console.log(results);
 
-		res.header("Content-Type", "application/json");
-		res.send(JSON.stringify(success));
+		res.send(results);
 	});
 }
 
